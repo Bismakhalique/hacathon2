@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Page</title>
+    <style>
+        /* Your CSS styles here */
+        .header {
+    background-color:  #3498db; 
+    color: white; /* Text color */
+    padding: 3px 0;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .container img {
+            max-width: 150px;
+            margin: 10px auto;
+            display: block;
+        }
+
+        .password-form input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            outline: none;
+        }
+
+        #update-button {
+            background-color: #4f9acd;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #update-button:hover {
+            background-color: #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Personal Blogging App</h1>
+    </div> <br>
+    <div class="container">
+        <img src="./profile 4.png" alt="Profile Image">
+        <h1>Inzamam Malik</h1>
+        <div class="password-form">
+            <input type="password" id="old-password" placeholder="Old Password">
+            <input type="password" id="new-password" placeholder="New Password">
+            <input type="password" id="repeat-password" placeholder="Repeat Password">
+            <button id="update-button">Update Password</button>
+        </div>
+    </div>
+
+    <!-- Firebase configuration and script -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js"></script>
+    <script>
+        const firebaseConfig = {
+    apiKey: "AIzaSyD_IlgCjVWF3yPNKveeVHdZi77Nn0AupPQ",
+    authDomain: "smit-project-293db.firebaseapp.com",
+    databaseURL: "https://smit-project-293db-default-rtdb.firebaseio.com",
+    projectId: "smit-project-293db",
+    storageBucket: "smit-project-293db.appspot.com",
+    messagingSenderId: "37947608465",
+    appId: "1:37947608465:web:3bd9f6c26094a8fea5de30",
+    measurementId: "G-7TH7WNBC0P"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Reference to the Firebase authentication service
+        const auth = firebase.auth();
+
+        // Function to handle updating the password
+        function updatePassword() {
+            const oldPassword = document.querySelector('#old-password').value;
+            const newPassword = document.querySelector('#new-password').value;
+            const repeatPassword = document.querySelector('#repeat-password').value;
+
+            if (newPassword !== repeatPassword) {
+                alert("New passwords do not match.");
+                return;
+            }
+
+            // Get the current user
+            const user = auth.currentUser;
+
+            // Reauthenticate the user with their old password
+            const credentials = firebase.auth.EmailAuthProvider.credential(
+                user.email,
+                oldPassword
+            );
+
+            user.reauthenticateWithCredential(credentials)
+                .then(() => {
+                    // User has been successfully reauthenticated
+                    // Now update the password
+                    return user.updatePassword(newPassword);
+                })
+                .then(() => {
+                    // Password updated successfully
+                    alert("Password updated successfully");
+                })
+                .catch(error => {
+                    console.error("Error updating password:", error);
+                    alert("Error updating password. Please check your old password.");
+                });
+        }
+
+        // Add a click event listener to the update button
+        const updateButton = document.querySelector('#update-button');
+        updateButton.addEventListener('click', updatePassword);
+    </script>
+</body>
+</html>
